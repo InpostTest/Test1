@@ -28,17 +28,76 @@ var Logger = (function () {
 var ListViewer = (function () {
 	
 	//constructor
-    function ListViewer(element, logger) {
+    function ListViewer(element, restURI, logger, xhr) {
+
         this.element = element;
-        this.logger = logger;
-        this.logger.log("SDK INITIALIZE");
-    }
-	
+        this.restURI = restURI;
+        this.loggerService = logger;
+        this.xhrService = xhr;
+        this.loggerService.log("WIDGET INITIALIZE");
+    };
+
+    ListViewer.prototype.loadData = function () {
+
+        var me = this;
+
+        loadFile(this.restURI);
+
+        function xhrSuccess () { 
+            
+            me.data = JSON.parse(this.responseText)._embedded.machines;
+            me.render.call(me);
+        }
+
+        function xhrError () { 
+        }
+
+        function loadFile (url, callback) {
+
+          var req = new XMLHttpRequest();
+          req.callback = callback;
+          req.onload = xhrSuccess;
+          req.onerror = xhrError;
+          req.open("get", url, true);
+          req.send(null);
+        }
+    };
+
+    ListViewer.prototype.render = function () {
+
+        var targetDiv = this.element;
+        var listContent = this.getTemplate();
+        targetDiv.appendChild(listContent);
+    };
+
+    ListViewer.prototype.getTemplate = function () {
+
+        var str = "";
+        for (var i = 0; i < this.data.length; i++) {
+            str += this.data[i].id + ", ";
+        }
+
+        var newDiv = document.createElement("div");
+        var newContent = document.createTextNode(str);
+        newDiv.appendChild(newContent);
+
+        return newDiv;
+    };
+
     return ListViewer;
 })();
 
 window.onload = function () {
-	
-    var el = document.getElementById('content');
-    var listViewer = new ListViewer(el, new Logger(LoggerTypes.console));
+
+    var mainLogger = new Logger(LoggerTypes.console);
+    mainLogger.log("SDK INITIALIZE");
+
+    var listConfig = {
+        restURI: "https://api-pl.easypack24.net/v4/machines?type=0",
+        el: document.getElementById('content')
+    }
+
+    var listViewer = new ListViewer(listConfig.el, listConfig.restURI, mainLogger);
+
+    listViewer.loadData();
 };
