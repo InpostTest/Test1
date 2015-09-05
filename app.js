@@ -161,7 +161,7 @@ window.onload = function () {
     mainLogger.log("SDK INITIALIZE");
 
     var listConfig = {
-        typeId, typeId,
+        typeId: typeId,
         restURI: "https://api-pl.easypack24.net/v4/" + typeId + "?type=0",
         el: document.getElementById('content')
     };
