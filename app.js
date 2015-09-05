@@ -1,5 +1,5 @@
 
-//ToDo: JSDOCS, CACHE
+//ToDo: JSDOCS
 
 //logger type enum
 var LoggerTypes;
@@ -75,6 +75,11 @@ var CacheManager = (function () {
         sessionStorage.setItem(id, JSON.stringify(data));
     };
 
+    CacheManager.prototype.clear = function (id, data) {
+
+        sessionStorage.removeItem(id);
+    };
+
     return CacheManager;
 })();
 
@@ -94,26 +99,30 @@ var ListViewer = (function () {
         this.loggerService.log("WIDGET INITIALIZE");
     };
 
-    ListViewer.prototype.loadData = function () {
+    ListViewer.prototype.start = function () {
 
         if(this.cacheService.isCached(this.typeId))
-            this.loadSuccess(this.cacheService.get(this.typeId));
+            this.load(this.cacheService.get(this.typeId));
         else
             this.xhrService.get(this.restURI, this.loadSuccess.bind(this), this.loadError.bind(this));
+    };
+
+    ListViewer.prototype.load = function (data) {
+
+        this.data = data._embedded.machines;
+        this.render.call(this);
     };
 
     ListViewer.prototype.loadSuccess = function (data) {
 
         this.cacheService.set(this.typeId, data);
-
-        this.data = data._embedded.machines;
-        this.render.call(this);
-        this.loggerService.log("WIDGET LOAD SUCCESS");
+        this.load(data);
+        this.loggerService.log("DATA LOAD SUCCESS");
     };
 
     ListViewer.prototype.loadError = function (xhr) {
 
-        this.loggerService.log("WIDGET LOAD ERROR");
+        this.loggerService.log("DATA LOAD ERROR");
     };
 
     ListViewer.prototype.render = function () {
@@ -159,5 +168,5 @@ window.onload = function () {
 
     var listViewer = new ListViewer(listConfig.el, listConfig.restURI, listConfig.typeId, mainLogger, xhrUtils, cacheManager);
 
-    listViewer.loadData();
+    listViewer.start();
 };
