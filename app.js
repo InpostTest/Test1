@@ -135,15 +135,15 @@ var ListViewer = (function () {
 
     ListViewer.prototype.getTemplate = function () {
 
-        var str = "";
+        var newDiv = document.createElement("div");
+
+        var str = "<select>";
         for (var i = 0; i < this.data.length; i++) {
-            str += this.data[i].id + ", ";
+            str += "<option>" + this.data[i].id + " - " + this.data[i].status + "</option>";
         }
+        str += "</select>";
 
-        var newDiv = document.createElement("div")
-            ,newContent = document.createTextNode(str);
-
-        newDiv.appendChild(newContent);
+        newDiv.innerHTML = str;
 
         return newDiv;
     };
