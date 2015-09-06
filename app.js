@@ -50,7 +50,7 @@ var XhrUtils = (function () {
     return XhrUtils;
 })();
 
-//xhr utils service class
+//cache manager service class
 var CacheManager = (function () {
 
     //constructor
@@ -87,14 +87,14 @@ var CacheManager = (function () {
 var ListViewer = (function () {
 	
 	//constructor
-    function ListViewer(element, restURI, typeId, logger, xhr, cache) {
+    function ListViewer(config) {
 
-        this.element = element;
-        this.restURI = restURI;
-        this.typeId = typeId;
-        this.loggerService = logger;
-        this.xhrService = xhr;
-        this.cacheService = cache;
+        this.element = document.getElementById(config.elementId);
+        this.restURI = config.restURI;
+        this.typeId = config.typeId;
+        this.loggerService = config.logger;
+        this.xhrService = config.xhrUtils;
+        this.cacheService = config.cacheManager;
 
         this.loggerService.log("WIDGET INITIALIZE");
     };
@@ -151,6 +151,7 @@ var ListViewer = (function () {
     return ListViewer;
 })();
 
+//document startup
 window.onload = function () {
 
     var typeId = "machines"
@@ -160,13 +161,14 @@ window.onload = function () {
 
     mainLogger.log("SDK INITIALIZE");
 
-    var listConfig = {
-        typeId: typeId,
+    var listViewer = new ListViewer({
+        elementId: "content",
         restURI: "https://api-pl.easypack24.net/v4/" + typeId + "?type=0",
-        el: document.getElementById('content')
-    };
-
-    var listViewer = new ListViewer(listConfig.el, listConfig.restURI, listConfig.typeId, mainLogger, xhrUtils, cacheManager);
+        typeId: typeId,
+        logger: mainLogger,
+        xhrUtils: xhrUtils,
+        cacheManager: cacheManager
+    });
 
     listViewer.start();
 };
