@@ -168,25 +168,25 @@ var ListViewer = (function () {
             this.xhrService.get(this.restURI, this.loadSuccess.bind(this), this.loadError.bind(this));
     };
 
-    function load(data) {
+    ListViewer.prototype.load = function(data) {
 
         this.data = data._embedded.machines;
         this.render.call(this);
     };
 
-    function loadSuccess(data) {
+    ListViewer.prototype.loadSuccess = function(data) {
 
         this.cacheService.set(this.typeId, data);
         this.load(data);
         this.loggerService.log("DATA LOAD SUCCESS");
     };
 
-    function loadError(xhr) {
+    ListViewer.prototype.loadError = function(xhr) {
 
         this.loggerService.log("DATA LOAD ERROR");
     };
 
-    function render() {
+    ListViewer.prototype.render = function() {
 
         var targetDiv = this.element
             ,listContent = this.getTemplate();
@@ -194,7 +194,7 @@ var ListViewer = (function () {
         targetDiv.appendChild(listContent);
     };
 
-    function getTemplate() {
+    ListViewer.prototype.getTemplate = function() {
 
         var newDiv = document.createElement("div");
 
